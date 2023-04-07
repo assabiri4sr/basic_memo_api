@@ -1,14 +1,27 @@
-// Import packages
 const express = require("express");
-const home = require("./routes/home");
-
-// Middlewares
+const mongoose = require("mongoose");
 const app = express();
+const tasks = require("./routes/tasks");
+require("dotenv").config();
+const cors = require("cors");
+
+const connectDb = (url) => {
+  return mongoose.connect(url);
+};
+app.use(cors({ origin: "*" }));
+
 app.use(express.json());
+app.use("/api/v1/tasks", tasks);
 
-// Routes
-app.use("/home", home);
+const port = 5000;
 
-// connection
-const port = process.env.PORT || 9001;
-app.listen(port, () => console.log(`Listening to port ${port}`));
+const start = async () => {
+  try {
+    await connectDb(process.env.MONGO_URI);
+    app.listen(port, console.log(`Hi sever listin on port ${port}`));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+start();
